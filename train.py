@@ -5,18 +5,19 @@ Created on Thu Dec  3 15:50:45 2020
 @author: kahg8
 """
 import tensorflow as tf
-import os
+
 # Helper libraries
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.io import wavfile
 
+from sklearn.model_selection import GridSearchCV
+from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Flatten, Dense, Input,Reshape,Permute, Lambda,Conv2D, Conv1D, MaxPooling1D,MaxPooling2D, GlobalMaxPooling1D, GlobalMaxPooling1D, AveragePooling1D, LSTM, Dropout, BatchNormalization
 from tensorflow.keras import backend as K
 from preprocessing import get_training_data
-from kapre.composed import get_melspectrogram_layer
+
 tf.random.set_seed(7)
 ##############################################
 
@@ -25,7 +26,7 @@ validation_size = int(np.round(training_size/10))
 preprocessing = True
 data_augmentation = False
 test_size = 100
-nb_epochs = 10
+nb_epochs = 50
 batch_size = 25
 nb_layers = 5
 num_ceps = 13
@@ -52,28 +53,28 @@ def create_model_cnn(layer_nb = 5,input_shape = (98,num_ceps), learning_rate = 0
     model.add(BatchNormalization(name='block1_batchnorm'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling1D(2, strides=2, name='block1_pool'))  
-    model.add(Dropout(0.01))
+    model.add(Dropout(0.1))
     # Block 2
     model.add(Conv1D(128, 3, padding='same', name='block2_conv1'))    
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block2_batchnorm'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling1D(2, strides=2, name='block2_pool'))   
-    model.add(Dropout(0.03))
+    model.add(Dropout(0.2))
     # Block 3
     model.add(Conv1D(256, 3, padding='same', name='block3_conv1'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block3_batchnorm'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling1D(2, strides=2, name='block3_pool'))
-    model.add(Dropout(0.05))
+    model.add(Dropout(0.3))
     # Block 4
     model.add(Conv1D(512, 3, padding='same', name='block4_conv1'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block4_batchnorm'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling1D(2, strides=2, name='block4_pool'))
-    model.add(Dropout(0.1))
+    model.add(Dropout(0.4))
     
     # Block 5
     model.add(Conv1D(512, 3, padding='same', name='block5_conv1'))
@@ -123,33 +124,33 @@ def convSpeech(layer_nb = 5,input_shape = (98,num_ceps),sampling_rate = 16000, l
     model.add(BatchNormalization())
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling2D((2, 1)))
-    
+    model.add(Dropout(0.05)) 
 
     model.add(Conv2D(40, (3, 3), padding='same'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization())
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling2D((2, 2)))
-    
+    model.add(Dropout(0.05)) 
 
     model.add(Conv2D(80, (3, 3), padding='same'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization())
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling2D((2, 2)))
-    
+    model.add(Dropout(0.03)) 
 
     model.add(Conv2D(160, (3, 3), padding='same'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization())
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling2D((2, 2)))
-    
+    model.add(Dropout(0.5)) 
 
     model.add(Flatten())
     
-    model.add(Dense(512, activation='relu'))
-    model.add(Dense(256, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(32, activation='relu'))
 
     model.add(Dense(n_label, activation='softmax'))
 
@@ -158,8 +159,8 @@ def convSpeech(layer_nb = 5,input_shape = (98,num_ceps),sampling_rate = 16000, l
     
     return model
 
-def create_model_mlp(layer_nb = 5,input_shape = (98,13), learning_rate = 0.00001,mlp_nodes = 200,n_label = 11,dense_units=128):   
-    model = tf.keras.Sequential(name='cnn_best')    
+def create_model_mlp(layer_nb = 5,input_shape = (98,13), learning_rate = 0.00001,n_label = len(labels),dense_units=256):   
+    model = tf.keras.Sequential(name='mlp')    
     model.add(Dense(dense_units, name='fc1',input_shape = input_shape))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block1_batchnorm'))
@@ -176,6 +177,34 @@ def create_model_mlp(layer_nb = 5,input_shape = (98,13), learning_rate = 0.00001
     optimizer = RMSprop(lr=learning_rate)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
     return model
+
+def grid_search_mlp(train_data,train_label,validation_data,epochs,batch_size,nb_layer,mlp_nodes):
+    for epoch in epochs :
+        for bs in batch_size:
+            for layer in nb_layer:
+                for n in mlp_nodes :
+                    
+                    model = create_model_mlp(layer_nb = layer,dense_units=n)
+                    model.fit(train_data,train_label,validation_data=(validation_data),epochs = epoch,batch_size = bs)
+                    model.save('models\{}_{}epochs_{}batchsize_{}layers_{}nodes.h5'.format(model.name,epoch,bs,layer,n))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##############################################
             # MAIN
 ##############################################
@@ -183,11 +212,42 @@ train_data,train_label,validation_data,validation_label = get_training_data(trai
 print('Training on {} examples !'.format(train_data.shape[0]))
 
 print('Validation on {} examples !'.format(validation_data.shape[0]))
-
-if preprocessing :
-    model = create_model_cnn()
-else:
-    model = convSpeech()
+epochs = [30,40,50,60,70]
+batch_size = [25,30,40,50]
+nb_layer = [3,4,5,6,7]
+mlp_nodes = [100,120,150,200,400,800]
+grid_search_mlp(train_data, train_label, (validation_data,validation_label), epochs, batch_size, nb_layer, mlp_nodes)
 #model = create_model_mlp(5)
-model.fit(train_data,train_label,validation_data=(validation_data,validation_label),epochs = nb_epochs,batch_size = batch_size)
-model.save('models\{}epochs_{}batchsize_{}layers_{}training.h5'.format(nb_epochs,batch_size,nb_layers,training_size))
+
+
+###############################################
+        # Grid search
+        
+# model = KerasClassifier(build_fn=create_model_cnn, verbose=0)
+# # define the grid search parameters
+# batch_size = [10, 20, 40, 50]
+# epochs = [10, 15, 20]
+# dense_units = [512,1024, 2048, 4096]
+# l
+# param_grid = dict(batch_size=batch_size, epochs=epochs)
+# grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=-1, cv=3)
+# grid_result = grid.fit(train_data,train_label)
+# # summarize results
+# print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
