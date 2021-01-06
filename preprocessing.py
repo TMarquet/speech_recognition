@@ -8,10 +8,10 @@ Created on Fri Dec  4 16:19:20 2020
 import os
 # Helper libraries
 import numpy as np
-
+import time
 from scipy.io import wavfile
-
-
+import matplotlib.pyplot as plt
+import random
 from python_speech_features import mfcc
 
 labels = ["yes", "no", "up", "down", "left",
@@ -131,9 +131,36 @@ def get_filter_banks(signal,sample_rate,nfilt,NFFT):
         
         
 #     return data
+def preprocess_live_data(signal,sample_rate):
+    length_signal = len(signal)
+    if length_signal > 16000:
+        best_chunk = []
+        best_sum = 0
+    
+        for k in range(0,length_signal):
+            sub = signal[k:k+16000]
+            sum_sub = np.sum(abs(sub))
+            if sum_sub > best_sum:
+                best_sum = sum_sub
+                best_chunk = sub
+        # plt.plot(range(0,16000),best_chunk)
+        # plt.show()        
+        signal = best_chunk
+    mfcc_feat = mfcc(signal,sample_rate,winlen=0.03)
+    np.subtract(mfcc_feat,np.mean(mfcc_feat))
+    np.divide(mfcc_feat,mfcc_feat.std())
+    
+    return np.reshape(mfcc_feat,(1,98,13))   
 
+def count_down():
+    start = time.time()
+    while(time.time() - start < 3):
+        count = time.time()-start
+        if count.is_integer():
+            print(str(int(count))+' ! \n')
+            
 
-def get_training_data(training_size,validation_size,data_augmentation,preprocessing):
+def get_training_data(training_size,validation_size,data_augmentation,preprocessing,noise):
     test_files = np.loadtxt('testing_list.txt', dtype=str)
     validation_files = np.loadtxt('validation_list.txt', dtype=str)
     all_labels = labels[:len(labels)-1] + unknown_labels
@@ -150,7 +177,13 @@ def get_training_data(training_size,validation_size,data_augmentation,preprocess
     
     training_data = []
     validation_data = []
-    
+    noises = []
+    if noise:
+        for noi in os.listdir('_background_noise_'):
+            print('Processing noise : ', noi)
+            if '.wav' in noi:
+                sample_rate, audio = wavfile.read('_background_noise_/'+noi)
+                noises.append(audio)
     
     for label in sorted(all_labels) :        
         all_files = os.listdir(label)
@@ -171,6 +204,11 @@ def get_training_data(training_size,validation_size,data_augmentation,preprocess
                             average = (last_audio1 + audio)/2
                             audio_to_process.append(average)
                         last_audio1 = audio
+                    if noise :
+                        noise_selected = random.randint(0,len(noises)-1)
+                        window_selected = random.randint(0,len(noises[noise_selected])-16000-1)
+                        coef_selected = random.random()
+                        audio_to_process.append(audio + coef_selected * noises[noise_selected][window_selected:window_selected+16000])
                     if preprocessing:
                         for signal in audio_to_process :
                             mfcc_feat = mfcc(signal,sample_rate,winlen=0.03)
@@ -206,6 +244,11 @@ def get_training_data(training_size,validation_size,data_augmentation,preprocess
                     average = (last_audio1[label] + audio)/2
                     audio_to_process.append(average)
                 last_audio1[label] = audio
+            if noise :
+                noise_selected = random.randint(0,len(noises)-1)
+                window_selected = random.randint(0,len(noises[noise_selected])-16000-1)
+                coef_selected = random.random()
+                audio_to_process.append(audio + coef_selected * noises[noise_selected][window_selected:window_selected+16000])
             if preprocessing:
                 for signal in audio_to_process :
                     mfcc_feat = mfcc(signal,sample_rate,winlen=0.03)
@@ -239,7 +282,7 @@ def get_training_data(training_size,validation_size,data_augmentation,preprocess
     return np.array(training_data_set),np.array(training_label_set),np.array(validation_data_set),np.array(validation_label_set)
 
 
-def get_test_data(test_size,data_augmentation,preprocessing):
+def get_test_data(test_size,data_augmentation,preprocessing,noise):
     test_files = np.loadtxt('testing_list.txt', dtype=str)
 
 
@@ -251,6 +294,13 @@ def get_test_data(test_size,data_augmentation,preprocessing):
     test_data = []
     count_test_file = {}
     last_audio1 = {}
+    noises = []
+    if noise:
+        for noi in os.listdir('_background_noise_'):
+            print('Processing noise : ', noi)
+            if '.wav' in noi:
+                sample_rate, audio = wavfile.read('_background_noise_/'+noi)
+                noises.append(audio)
     for file in test_files:
         label = file.split('/')[0]
         if not label in count_test_file:
@@ -269,6 +319,11 @@ def get_test_data(test_size,data_augmentation,preprocessing):
                     average = (last_audio1[label] + audio)/2
                     audio_to_process.append(average)
                 last_audio1[label] = audio
+            if noise :
+                noise_selected = random.randint(0,len(noises)-1)
+                window_selected = random.randint(0,len(noises[noise_selected])-16000-1)
+                coef_selected = random.random()
+                audio_to_process.append(audio + coef_selected * noises[noise_selected][window_selected:window_selected+16000])
             if preprocessing:
                 for signal in audio_to_process :
                     mfcc_feat = mfcc(signal,sample_rate,winlen=0.03)

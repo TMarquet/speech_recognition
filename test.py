@@ -21,9 +21,10 @@ from preprocessing import get_test_data
 
 
 ############################
-test_size = 100000000
+test_size = 1000
 preprocessing = True
 data_augmentation = False
+noise = False
 labels = ["yes", "no", "up", "down", "left",
 "right", "on", "off", "stop", "go", "zero", "one", "two", "three", "four",
 "five", "six", "seven", "eight", "nine","unknown"]
@@ -42,12 +43,12 @@ def metrics(tp,fp,tn,fn,p,n):
 ############################
         # MAIN
 ############################
-test_data ,test_labels = get_test_data(test_size,data_augmentation,preprocessing)
+test_data ,test_labels = get_test_data(test_size,data_augmentation,preprocessing,noise)
 print('Test done on {} examples'.format(test_data.shape[0]))
-
-for file in os.listdir('models'):
+directory_path = 'models'
+for file in os.listdir(directory_path):
     print('Loading model :',file)
-    model = load_model('models/'+file)
+    model = load_model(directory_path+ '/'+file)
 
 
     true_positive = {}

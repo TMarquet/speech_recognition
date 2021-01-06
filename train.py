@@ -25,9 +25,10 @@ training_size = 190000000
 validation_size = int(np.round(training_size/10))
 preprocessing = True
 data_augmentation = False
+noise = False
 test_size = 100
 nb_epochs = 50
-batch_size = 25
+batch = 25
 nb_layers = 5
 num_ceps = 13
 labels = ["yes", "no", "up", "down", "left",
@@ -43,7 +44,7 @@ unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "shei
 ##############################################
 
 
-def create_model_cnn(layer_nb = 5,input_shape = (98,num_ceps), learning_rate = 0.0001,mlp_nodes = 200,n_label = len(labels),dense_units=4096):    
+def create_model_cnn(layer_nb = 5,input_shape = (98,num_ceps), learning_rate = 0.0001,n_label = len(labels),dense_units=4096):    
     model = tf.keras.Sequential(name='cnn_best')
     
     # Convolution Blocks
@@ -208,32 +209,24 @@ def grid_search_mlp(train_data,train_label,validation_data,epochs,batch_size,nb_
 ##############################################
             # MAIN
 ##############################################
-train_data,train_label,validation_data,validation_label = get_training_data(training_size,validation_size,data_augmentation,preprocessing)
+train_data,train_label,validation_data,validation_label = get_training_data(training_size,validation_size,data_augmentation,preprocessing,noise)
 print('Training on {} examples !'.format(train_data.shape[0]))
 
 print('Validation on {} examples !'.format(validation_data.shape[0]))
-epochs = [30,40,50,60,70]
-batch_size = [25,30,40,50]
-nb_layer = [3,4,5,6,7]
-mlp_nodes = [100,120,150,200,400,800]
-grid_search_mlp(train_data, train_label, (validation_data,validation_label), epochs, batch_size, nb_layer, mlp_nodes)
-#model = create_model_mlp(5)
+# epochs = [30,40,50,60,70]
+# batch_size = [25,30,40,50]
+# nb_layer = [3,4,5,6,7]
+# mlp_nodes = [100,120,150,200,400,800]
+# grid_search_mlp(train_data, train_label, (validation_data,validation_label), epochs, batch_size, nb_layer, mlp_nodes)
+
 
 
 ###############################################
-        # Grid search
+        # Single train
         
-# model = KerasClassifier(build_fn=create_model_cnn, verbose=0)
-# # define the grid search parameters
-# batch_size = [10, 20, 40, 50]
-# epochs = [10, 15, 20]
-# dense_units = [512,1024, 2048, 4096]
-# l
-# param_grid = dict(batch_size=batch_size, epochs=epochs)
-# grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=-1, cv=3)
-# grid_result = grid.fit(train_data,train_label)
-# # summarize results
-# print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+model = create_model_cnn()
+model.fit(train_data,train_label,validation_data = (validation_data,validation_label),epochs = nb_epochs,batch_size = batch)
+model.save('models\{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch))
 
 
 
