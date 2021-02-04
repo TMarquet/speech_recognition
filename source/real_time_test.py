@@ -7,7 +7,7 @@ Created on Thu Jan 28 14:15:43 2021
 
 import argparse
 import queue
-import time as t
+
 import sys
 from data_analysis import frame_generator
 from matplotlib.animation import FuncAnimation
@@ -16,11 +16,9 @@ import numpy as np
 import sounddevice as sd
 import webrtcvad
 import tensorflow as tf
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.models import Model, Sequential, load_model
-from tensorflow.keras.layers import Flatten, Dense, Input, Lambda, Conv1D, MaxPooling1D, GlobalMaxPooling1D, GlobalMaxPooling1D, AveragePooling1D, LSTM, Dropout, BatchNormalization
-from tensorflow.keras import backend as K
-from preprocessing import preprocess_live_data,count_down,pad_audio
+
+from tensorflow.keras.models import load_model
+from preprocessing import preprocess_live_data
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 
@@ -34,7 +32,7 @@ labels = ["yes", "no", "up", "down", "left",
 
 unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "sheila",
 "tree","wow"]
-model1 = load_model('models/bests_silence0/mlp_mfcc_40epochs_50batchsize.h5')
+model1 = load_model('models/bests_silence0/small_cnn_mfcc_60epochs_50batchsize.h5')
 
 def int_or_str(text):
     """Helper function for argument parsing."""
@@ -68,14 +66,15 @@ parser.add_argument(
 parser.add_argument(
     '-i', '--interval', type=float, default=30,
     help='minimum time between plot updates (default: %(default)s ms)')
-parser.add_argument(
-    '-b', '--blocksize', type=int, help='block size (in samples)')
-parser.add_argument(
-    '-r', '--samplerate', type=float, help='sampling rate of audio device')
-parser.add_argument(
-    '-n', '--downsample', type=int, default=10, metavar='N',
-    help='display every Nth sample (default: %(default)s)')
+
+
+
 args = parser.parse_args(remaining)
+
+
+
+
+
 if any(c < 1 for c in args.channels):
     parser.error('argument CHANNEL: must be >= 1')
 mapping = [c - 1 for c in args.channels]  # Channel numbers start with 1
@@ -98,17 +97,8 @@ def get_best_chunk(data):
             best_chunk = sub
     return best_chunk
 
-def shift(list_data,new_data):
-    n = len(new_data)
-    if len(list_data) < 16000:
-        shifted = list_data.copy() + new_data
-    else:
-        shifted = list_data[n:].copy() + new_data
-    
-    return shifted
 
 def audio_callback(indata, frames, time, status):
-    """This is called (from a separate thread) for each audio block."""
     if status:
         print(status, file=sys.stderr)
     # Fancy indexing with mapping creates a (necessary!) copy:
@@ -116,12 +106,12 @@ def audio_callback(indata, frames, time, status):
     
 
    
-    q.put(indata[::args.downsample, mapping])
+    q.put(indata[::10, mapping])
 
     new_data = []
     for elem in indata:
         new_data.append(elem[0])
-    frames_l = frame_generator(10, np.array(new_data), args.samplerate)
+    frames_l = frame_generator(10, np.array(new_data), 16000)
     
     frames_l = list(frames_l) 
 
@@ -129,7 +119,7 @@ def audio_callback(indata, frames, time, status):
     
     for frame in frames_l:
 
-        if not vad.is_speech(frame.bytes, int(args.samplerate)):
+        if not vad.is_speech(frame.bytes, 16000):
             speech = False
             break   
 
@@ -159,7 +149,7 @@ def audio_callback(indata, frames, time, status):
         data = np.array(data)
 
         
-        inputs = preprocess_live_data(data,args.samplerate)
+        inputs = preprocess_live_data(data,16000)
             
         
         prediction = model1.predict(np.array([inputs]))
@@ -179,12 +169,6 @@ def audio_callback(indata, frames, time, status):
 
 
 def update_plot(frame):
-    """This is called by matplotlib for each plot update.
-
-    Typically, audio callbacks happen more frequently than plot updates,
-    therefore the queue tends to contain multiple blocks of audio data.
-
-    """
     global plotdata
     global ax
 
@@ -203,11 +187,8 @@ def update_plot(frame):
 
 
 try:
-    if args.samplerate is None:
-        device_info = sd.query_devices(args.device, 'input')
-        args.samplerate = device_info['default_samplerate']
 
-    length = int(args.window * args.samplerate / (1000 * args.downsample))
+    length = int(args.window * 16000 / (1000 * 10))
     plotdata = np.zeros((length, len(args.channels)))
 
     fig, ax = plt.subplots()
@@ -227,7 +208,7 @@ try:
         bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 10})  
     stream = sd.InputStream(
         device=args.device,blocksize=500, channels=max(args.channels),
-        samplerate=args.samplerate, callback=audio_callback,dtype=np.int16)
+        samplerate=16000, callback=audio_callback,dtype=np.int16)
 
     ani = FuncAnimation(fig, update_plot, interval=args.interval, blit=True)
     with stream:

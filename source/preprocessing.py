@@ -21,6 +21,8 @@ labels = ["yes", "no", "up", "down", "left",
 unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "sheila",
 "tree","wow"]
 
+PATH_LIST = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/lists/'
+PATH_DATA = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/data/'
 
 # training_size = 'all'
 
@@ -158,8 +160,8 @@ def count_down():
 
 def make_training_list(labels,unknown_labels,training_size):
     all_labels = labels[:len(labels)-2] 
-    test_files = np.loadtxt('testing_list.txt', dtype=str)
-    validation_files = np.loadtxt('validation_list.txt', dtype=str) 
+    test_files = np.loadtxt(PATH_LIST + 'testing_list.txt', dtype=str)
+    validation_files = np.loadtxt(PATH_LIST + 'validation_list.txt', dtype=str) 
     training_files = []  
     total = 0
     if training_size == 'all':
@@ -171,7 +173,7 @@ def make_training_list(labels,unknown_labels,training_size):
         max_un = 10
         name= 'training_list_small.txt'
         
-    with open(name,'w') as f:
+    with open(PATH_DATA + name,'w') as f:
         for label in sorted(all_labels):
             all_files = os.listdir(label)
             count = 0
@@ -200,7 +202,7 @@ def make_training_list(labels,unknown_labels,training_size):
 def make_validation_list(labels,unknown_labels,training_size):
     all_labels = labels[:len(labels)-2] 
 
-    validation_files = np.loadtxt('validation_list.txt', dtype=str) 
+    validation_files = np.loadtxt(PATH_LIST + 'validation_list.txt', dtype=str) 
     training_files = []  
     count = {}
     total = 0 
@@ -213,7 +215,7 @@ def make_validation_list(labels,unknown_labels,training_size):
         max_un = 2  
         name = 'validation_list_small.txt'
     
-    with open(name,'w') as f:
+    with open(PATH_LIST + name,'w') as f:
         for file in validation_files:
             label = file.split("/")[0]
             if not label in count:
@@ -233,19 +235,19 @@ def make_validation_list(labels,unknown_labels,training_size):
 def get_training_data(training_size,labels,unknown_labels,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise):
     
     if training_size == 'all':
-        training_files = np.loadtxt('training_list_all.txt', dtype=str)
-        validation_files = np.loadtxt('validation_list_all.txt', dtype=str)
+        training_files = np.loadtxt(PATH_LIST + 'training_list_all.txt', dtype=str)
+        validation_files = np.loadtxt(PATH_LIST + 'validation_list_all.txt', dtype=str)
     else:
-        training_files = np.loadtxt('training_list_small.txt', dtype=str)
-        validation_files = np.loadtxt('validation_list_small.txt', dtype=str)
+        training_files = np.loadtxt(PATH_LIST + 'training_list_small.txt', dtype=str)
+        validation_files = np.loadtxt(PATH_LIST + 'validation_list_small.txt', dtype=str)
     if not add_silence:
         labels = labels[0:20]+[labels[-1]]
     training_data = {'raw':[],'mfcc':[],'ssc':[]}
     validation_data = {'raw':[],'mfcc':[],'ssc':[]}
     noises = []
-    for file in os.listdir('_background_noise_'):
+    for file in os.listdir(PATH_DATA + '_background_noise_'):
         if 'wav' in file:
-            path = os.path.join('_background_noise_',file)
+            path = os.path.join(PATH_DATA + '_background_noise_',file)
             sample_rate, audio = wavfile.read(path)            
             noises.append(audio)    
     first = {}   
@@ -263,7 +265,7 @@ def get_training_data(training_size,labels,unknown_labels,use_cut, use_raw, use_
                 sample_rate, audio = wavfile.read(path)
                      
         else:
-            path = file
+            path = PATH_DATA + file
             sample_rate, audio = wavfile.read(path)
         if len(audio < 16000):
             audio = pad_audio(audio) 
@@ -312,7 +314,7 @@ def get_training_data(training_size,labels,unknown_labels,use_cut, use_raw, use_
                 sample_rate, audio = wavfile.read(path)
                      
         else:
-            path = file
+            path = PATH_DATA + file
             sample_rate, audio = wavfile.read(path)
         if len(audio < 16000):
             audio = pad_audio(audio) 
@@ -437,15 +439,15 @@ def get_test_data(labels,unknown_labels,test_size, use_raw, use_mfcc, use_ssc, a
     
     
     
-    test_files = np.loadtxt('testing_list.txt', dtype=str)
+    test_files = np.loadtxt(PATH_LIST+ 'testing_list.txt', dtype=str)
 
     
     test_data = {'raw':[],'mfcc':[],'ssc':[]}
     
     noises = []
-    for file in os.listdir('_background_noise_'):
+    for file in os.listdir(PATH_DATA+'_background_noise_'):
         if 'wav' in file:
-            path = os.path.join('_background_noise_',file)
+            path = os.path.join(PATH_DATA+'_background_noise_',file)
             sample_rate, audio = wavfile.read(path)            
             noises.append(audio)    
     first = {}       
@@ -456,7 +458,7 @@ def get_test_data(labels,unknown_labels,test_size, use_raw, use_mfcc, use_ssc, a
             print('Processing label for test: ',label)
             audio_for_average = np.array([])
 
-        path = file
+        path = PATH_DATA +file
         sample_rate, audio = wavfile.read(path)
         if add_noise:
             noise_type = random.randint(0, len(noises)-1)

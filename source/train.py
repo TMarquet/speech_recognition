@@ -19,12 +19,13 @@ from tensorflow.keras import backend as K
 from preprocessing import get_training_data
 from tensorflow.keras.regularizers import l2
 
+PATH_MODELS= 'C:/Users/kahg8/Documents/GitHub/speech_recognition/models/'
 
 tf.random.set_seed(7)
 np.random.seed(7)
 ##############################################
 
-training_size = 'all'
+training_size = 'aqdzqzdll'
 
 nb_epochs = 80
 batch = 50
@@ -386,7 +387,7 @@ if use_mfcc:
         model = create_model_mlp('mfcc')
     
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath='models\{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
+    filepath=PATH_MODELS + '{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
     save_weights_only=False,
     monitor='val_accuracy',
     mode='max',
@@ -410,7 +411,7 @@ if use_ssc:
     else:
         model = create_model_mlp('ssc')
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath='models\{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
+    filepath=PATH_MODELS + '{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
     save_weights_only=False,
     monitor='val_accuracy',
     mode='max',
@@ -436,7 +437,7 @@ if use_raw:
         model = create_model_mlp('raw')
     
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath='models\{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
+    filepath=PATH_MODELS + '{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
     save_weights_only=False,
     monitor='val_accuracy',
     mode='max',

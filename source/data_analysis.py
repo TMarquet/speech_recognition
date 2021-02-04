@@ -8,13 +8,10 @@ import webrtcvad
 import os
 # Helper libraries
 import numpy as np
-import time
+
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
-import random
-from python_speech_features import mfcc,ssc
-from matplotlib import cm
+
 labels = ["yes", "no", "up", "down", "left",
 "right", "on", "off", "stop", "go", "zero", "one", "two", "three", "four",
 "five", "six", "seven", "eight", "nine",'silence','unknown']
@@ -28,7 +25,7 @@ import contextlib
 import sys
 import wave
 
-import webrtcvad
+
 
 
 def read_wave(path):
@@ -176,8 +173,8 @@ def vad_collector(sample_rate, frame_duration_ms,
 
 def observe_training_data():
     all_labels = labels[:len(labels)-2] 
-    test_files = np.loadtxt('testing_list.txt', dtype=str)
-    validation_files = np.loadtxt('validation_list.txt', dtype=str) 
+    test_files = np.loadtxt('/lists/testing_list.txt', dtype=str)
+    validation_files = np.loadtxt('/lists/validation_list.txt', dtype=str) 
      
     total = 0
     count = []
@@ -227,7 +224,7 @@ def observe_training_data():
 def observe_validation_data():
     all_labels = labels[:len(labels)-2] 
 
-    validation_files = np.loadtxt('validation_list.txt', dtype=str) 
+    validation_files = np.loadtxt('/lists/validation_list.txt', dtype=str) 
     
      
     count = {}
@@ -265,7 +262,7 @@ def observe_validation_data():
 def observe_test_data():
     all_labels = labels[:len(labels)-2] 
 
-    validation_files = np.loadtxt('testing_list.txt', dtype=str) 
+    validation_files = np.loadtxt('/lists/testing_list.txt', dtype=str) 
     
      
     count = {}
