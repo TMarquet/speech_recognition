@@ -10,31 +10,112 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.model_selection import GridSearchCV
+
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.models import Model, Sequential
-from tensorflow.keras.layers import Flatten, Dense, Input,Reshape,Permute, Lambda,Conv2D, Conv1D, MaxPooling1D,MaxPooling2D, GlobalMaxPooling1D, GlobalMaxPooling1D, AveragePooling1D, LSTM, Dropout, BatchNormalization
+from tensorflow.keras.optimizers import RMSprop,Adagrad
+from tensorflow.keras.models import Model, Sequential,load_model
+from tensorflow.keras.layers import TimeDistributed,Concatenate,Flatten, Dense, Input,Reshape,Permute, Lambda,Conv2D, Conv1D, MaxPooling1D,MaxPooling2D, GlobalMaxPooling1D, GlobalMaxPooling1D, AveragePooling1D, LSTM, Dropout, BatchNormalization
 from tensorflow.keras import backend as K
 from preprocessing import get_training_data
+from tensorflow.keras.regularizers import l2
+
 
 tf.random.set_seed(7)
+np.random.seed(7)
 ##############################################
 
-training_size = 190000000
-validation_size = int(np.round(training_size/10))
-preprocessing = True
-data_augmentation = False
-noise = False
-test_size = 100
-nb_epochs = 50
-batch = 25
+training_size = 'all'
+
+nb_epochs = 80
+batch = 50
 nb_layers = 5
 num_ceps = 13
-labels = ["yes", "no", "up", "down", "left",
-"right", "on", "off", "stop", "go", "zero", "one", "two", "three", "four",
-"five", "six", "seven", "eight", "nine","unknown"]
+data_type = 'mfcc'
+network_type = 'small_cnn'
 
+data_augmentation = False
+
+add_silence = False
+
+add_noise = False
+
+use_cut = False
+
+if data_type == 'mfcc':
+    
+    use_raw = False
+    
+    use_mfcc = True
+    
+    use_ssc = False
+elif data_type == 'ssc':
+    use_raw = False
+    
+    use_mfcc = False
+    
+    use_ssc = True
+else:
+    use_raw = True
+    
+    use_mfcc = False
+    
+    use_ssc = False
+
+
+if network_type == 'cnn':
+    
+    use_cnn = True
+    
+    use_small_cnn = False
+    
+    use_lstm = False
+    
+    use_lstm_cnn = False
+elif network_type == 'small_cnn':
+    use_cnn = False
+
+    use_small_cnn = True
+    
+    use_lstm = False
+    use_lstm_cnn = False
+elif network_type == 'lstm':
+    use_cnn = False
+    
+    use_small_cnn = False
+    
+    use_lstm = True
+    use_lstm_cnn = False
+elif network_type == 'lstm_cnn':
+    use_lstm_cnn = True
+    use_cnn = False
+    
+    use_small_cnn = False
+    
+    use_lstm = False
+
+
+else:
+    use_cnn = False
+    
+    use_small_cnn = False
+    
+    use_lstm = False
+    use_lstm_cnn = False
+
+
+
+
+
+
+if add_silence:
+
+    labels = ["yes", "no", "up", "down", "left",
+    "right", "on", "off", "stop", "go", "zero", "one", "two", "three", "four",
+    "five", "six", "seven", "eight", "nine","silence","unknown"]
+else:
+    labels = ["yes", "no", "up", "down", "left",
+    "right", "on", "off", "stop", "go", "zero", "one", "two", "three", "four",
+    "five", "six", "seven", "eight", "nine","unknown"]   
 unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "sheila",
 "tree","wow"]
 # Adding backgroud noise after
@@ -44,124 +125,83 @@ unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "shei
 ##############################################
 
 
-def create_model_cnn(layer_nb = 5,input_shape = (98,num_ceps), learning_rate = 0.0001,n_label = len(labels),dense_units=4096):    
-    model = tf.keras.Sequential(name='cnn_best')
+def create_model_cnn(data_type,layer_nb = 5, learning_rate = 0.0001,n_label = len(labels),dense_units=4096):        
+    model = tf.keras.Sequential(name='cnn_'+data_type)
+    
+    if data_type == 'mfcc':
+        input_shape = (98,13)
+    if data_type == 'ssc' :
+        input_shape = (98,26)
     
     # Convolution Blocks
     # Block 1
-    model.add(Conv1D(64, 3, padding='same', name='block1_conv1',input_shape = input_shape))
+    model.add(Conv1D(64, 3, padding='same', name='block1_conv',input_shape = input_shape))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block1_batchnorm'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling1D(2, strides=2, name='block1_pool'))  
-    model.add(Dropout(0.1))
+    
     # Block 2
-    model.add(Conv1D(128, 3, padding='same', name='block2_conv1'))    
+    model.add(Conv1D(128, 3, padding='same', name='block2_conv'))   
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block2_batchnorm'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling1D(2, strides=2, name='block2_pool'))   
-    model.add(Dropout(0.2))
+    
     # Block 3
-    model.add(Conv1D(256, 3, padding='same', name='block3_conv1'))
+    model.add(Conv1D(256, 3, padding='same', name='block3_conv'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block3_batchnorm'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling1D(2, strides=2, name='block3_pool'))
-    model.add(Dropout(0.3))
+    
     # Block 4
-    model.add(Conv1D(512, 3, padding='same', name='block4_conv1'))
+    model.add(Conv1D(512, 3, padding='same', name='block4_conv'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block4_batchnorm'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling1D(2, strides=2, name='block4_pool'))
-    model.add(Dropout(0.4))
+    
     
     # Block 5
-    model.add(Conv1D(512, 3, padding='same', name='block5_conv1'))
+    model.add(Conv1D(512, 3, padding='same', name='block5_conv'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block5_batchnorm'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(MaxPooling1D(2, strides=2, name='block5_pool'))
-    model.add(Dropout(0.5))
-    model.add(Flatten(name='flatten'))
+   
     
+   # End convolution
+   
+    model.add(Dropout(0.5,name = 'Dropout'))
+    
+    model.add(Flatten(name='flatten'))    
     # Two Dense layers
     
     model.add(Dense(dense_units, name='fc1'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization(name='block6_batchnorm'))
+    model.add(BatchNormalization(name='block_batchnorm_dense1'))
     model.add(tf.keras.layers.Activation('relu'))
     
-    
-    
+    model.add(Dropout(0.5))
+        
     model.add(Dense(dense_units, name='fc2'))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization(name='block7_batchnorm'))
+    model.add(BatchNormalization(name='block_batchnorm_dense2'))
     model.add(tf.keras.layers.Activation('relu'))       
-
-    # model.add(Dropout(0.5))
     
     model.add(Dense(n_label, activation='softmax', name='predictions'))
-
+    
     optimizer = RMSprop(lr=learning_rate)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    model.summary()
     return model
 
-def convSpeech(layer_nb = 5,input_shape = (98,num_ceps),sampling_rate = 16000, learning_rate = 0.00001,n_label = len(labels)):    
 
-    model = tf.keras.Sequential(name='ConvSpeechModel') 
-    model.add(Input(input_shape))
-    model.add(Reshape((98,num_ceps,1)))
-    #model.add(Normalization2D(int_axis=0))
-    # note that Melspectrogram puts the sequence in shape (batch_size, melDim, timeSteps, 1)
-    # we would rather have it the other way around for LSTMs
 
-    # x = Reshape((94,80)) (x) #this is strange - but now we have (batch_size,
-    # sequence, vec_dim)
 
-    model.add(Conv2D(20, (5, 1), padding='same'))
-    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization())
-    model.add(tf.keras.layers.Activation('relu'))
-    model.add(MaxPooling2D((2, 1)))
-    model.add(Dropout(0.05)) 
-
-    model.add(Conv2D(40, (3, 3), padding='same'))
-    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization())
-    model.add(tf.keras.layers.Activation('relu'))
-    model.add(MaxPooling2D((2, 2)))
-    model.add(Dropout(0.05)) 
-
-    model.add(Conv2D(80, (3, 3), padding='same'))
-    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization())
-    model.add(tf.keras.layers.Activation('relu'))
-    model.add(MaxPooling2D((2, 2)))
-    model.add(Dropout(0.03)) 
-
-    model.add(Conv2D(160, (3, 3), padding='same'))
-    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization())
-    model.add(tf.keras.layers.Activation('relu'))
-    model.add(MaxPooling2D((2, 2)))
-    model.add(Dropout(0.5)) 
-
-    model.add(Flatten())
-    
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(32, activation='relu'))
-
-    model.add(Dense(n_label, activation='softmax'))
-
-    optimizer = RMSprop(lr=learning_rate)
-    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
-    
-    return model
-
-def create_model_mlp(layer_nb = 5,input_shape = (98,13), learning_rate = 0.00001,n_label = len(labels),dense_units=256):   
-    model = tf.keras.Sequential(name='mlp')    
+def combined_model(layer_nb = 5,input_shape = (2,len(labels)), learning_rate = 0.00001,n_label = len(labels),dense_units=4084):   
+    model = tf.keras.Sequential(name='combined')    
     model.add(Dense(dense_units, name='fc1',input_shape = input_shape))
     model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='block1_batchnorm'))
@@ -179,23 +219,131 @@ def create_model_mlp(layer_nb = 5,input_shape = (98,13), learning_rate = 0.00001
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
     return model
 
-def grid_search_mlp(train_data,train_label,validation_data,epochs,batch_size,nb_layer,mlp_nodes):
-    for epoch in epochs :
-        for bs in batch_size:
-            for layer in nb_layer:
-                for n in mlp_nodes :
-                    
-                    model = create_model_mlp(layer_nb = layer,dense_units=n)
-                    model.fit(train_data,train_label,validation_data=(validation_data),epochs = epoch,batch_size = bs)
-                    model.save('models\{}_{}epochs_{}batchsize_{}layers_{}nodes.h5'.format(model.name,epoch,bs,layer,n))
+def create_model_mlp(data_type,layer_nb = 5,input_shape = (98,13), learning_rate = 0.00001,n_label = len(labels),dense_units=256):   
+    model = tf.keras.Sequential(name='mlp_'+ data_type) 
+    
+    if data_type == 'mfcc':
+        input_shape = (98,13)
+    if data_type == 'ssc' :
+        input_shape = (98,26)
+        
+    model.add(Dense(dense_units, name='fc1',input_shape = input_shape))
+    model.add(BatchNormalization(name='block1_batchnorm'))
+    model.add(tf.keras.layers.Activation('relu'))
+    
+    for i in range(2,layer_nb):
+        model.add(Dense(dense_units, name='fc'+str(i)))
+        model.add(BatchNormalization(name='block{}_batchnorm'.format(str(i))))
+        model.add(tf.keras.layers.Activation('relu'))  
+    
+    model.add(Flatten(name='flatten'))
+
+    model.add(Dense(n_label, activation='softmax', name='predictions'))
+    optimizer = RMSprop(lr=learning_rate)
+    
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    model.summary()
+    return model
 
 
 
 
 
 
+def create_model_lstm(data_type,cnn =False,layer_nb  = 5,classes = len(labels),lstm_nodes=64 , learning_rate = 0.0001):    
+    
+    
+    if data_type == 'mfcc':
+        input_shape = (98,13) if not cnn else (98,13,1)
+    if data_type == 'ssc' :
+        input_shape = (98,26) if not cnn else (98,26,1)
+
+    model = Sequential(name = 'lstm_{}'.format('' if not cnn else 'cnn_')+ data_type)
+    model.add(Input(shape = input_shape))
+    
+    if cnn:
+        cnn = Sequential(name= 'cnn_entry_'+data_type)
+            
+        cnn.add(Conv1D(22, 3, padding='same', name='conv1'))
+        cnn.add(BatchNormalization(name = 'batch_norm1'))
+        cnn.add(tf.keras.layers.Activation('relu'))
+        
+        cnn.add(Conv1D(44, 3, padding='same', name='conv2'))
+        cnn.add(BatchNormalization(name = 'batch_norm2'))
+        cnn.add(tf.keras.layers.Activation('relu'))
+        
+        cnn.add(Conv1D(22, 3, padding='same', name='conv3'))
+        cnn.add(BatchNormalization(name = 'batch_norm3'))
+        cnn.add(tf.keras.layers.Activation('relu'))
+        cnn.add(AveragePooling1D(2, strides=2, name='pooling'))
+               
+        model.add(TimeDistributed(cnn))
+        model.add(Reshape((98,-1)))
+            
+    
+    if layer_nb == 1:
+        model.add(LSTM(lstm_nodes,name = 'lstm_entry'))
+        model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
+        model.add(BatchNormalization(name='block1_batchnorm'))
+
+    else:
+        model.add(LSTM(lstm_nodes, return_sequences=True,name = 'lstm_entry'))
+        model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
+        model.add(BatchNormalization(name='block1_batchnorm'))
+        for i in range(2, layer_nb):
+            
+            model.add(LSTM(lstm_nodes, return_sequences=True,name = 'lstm_{}'.format(i)))
+            model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
+            model.add(BatchNormalization(name='block{}_batchnorm'.format(str(i))))
+        model.add(LSTM(lstm_nodes,name = 'lstm_out'))
+        model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
+        model.add(BatchNormalization(name='blockout_batchnorm'))
+    model.add(Flatten())
+    model.add(Dense(classes, activation='softmax', name='predictions'))
+    
+    optimizer = RMSprop(lr=learning_rate)
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    model.summary()
+    return model
 
 
+def create_model_small_cnn(data_type,labels = len(labels) , learning_rate = 0.0001,dense_units = 200):    
+    if data_type == 'mfcc':
+        input_shape = (98,13)
+    if data_type == 'ssc' :
+        input_shape = (98,26)
+        
+    model = tf.keras.Sequential(name='small_cnn_'+data_type) 
+    
+    model.add(Input(input_shape))
+
+
+    model.add(Conv1D(22, 3, padding='same', name='conv1'))
+    model.add(BatchNormalization(name = 'batch_norm1'))
+    model.add(tf.keras.layers.Activation('relu'))
+    
+    model.add(Conv1D(44, 3, padding='same', name='conv2'))
+    model.add(BatchNormalization(name = 'batch_norm2'))
+    model.add(tf.keras.layers.Activation('relu'))
+    
+    model.add(Conv1D(22, 3, padding='same', name='conv3'))
+    model.add(BatchNormalization(name = 'batch_norm3'))
+    model.add(tf.keras.layers.Activation('relu'))
+    model.add(AveragePooling1D(2, strides=2, name='pooling'))
+    
+
+    model.add(Flatten(name = 'flatten'))
+    
+
+    model.add(Dense(dense_units, name='dense'))
+    model.add(BatchNormalization(name='batch_norm_dense'))
+    model.add(tf.keras.layers.Activation('relu'))    
+
+    model.add(Dense(labels, activation='softmax',name = 'output'))
+    optimizer = RMSprop(lr=learning_rate)
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    model.summary()
+    return model
 
 
 
@@ -209,24 +357,103 @@ def grid_search_mlp(train_data,train_label,validation_data,epochs,batch_size,nb_
 ##############################################
             # MAIN
 ##############################################
-train_data,train_label,validation_data,validation_label = get_training_data(training_size,validation_size,data_augmentation,preprocessing,noise)
-print('Training on {} examples !'.format(train_data.shape[0]))
 
-print('Validation on {} examples !'.format(validation_data.shape[0]))
-# epochs = [30,40,50,60,70]
-# batch_size = [25,30,40,50]
-# nb_layer = [3,4,5,6,7]
-# mlp_nodes = [100,120,150,200,400,800]
-# grid_search_mlp(train_data, train_label, (validation_data,validation_label), epochs, batch_size, nb_layer, mlp_nodes)
+
+train_data,train_label,validation_data,validation_label= get_training_data(training_size, labels, unknown_labels,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise)
+
 
 
 
 ###############################################
         # Single train
-        
-model = create_model_cnn()
-model.fit(train_data,train_label,validation_data = (validation_data,validation_label),epochs = nb_epochs,batch_size = batch)
-model.save('models\{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch))
+
+
+
+if use_mfcc:
+    print('Training on {} examples !'.format(train_data['mfcc'].shape))
+    
+    print('Validation on {} examples !'.format(validation_data['mfcc'].shape))
+    if use_cnn:
+        model = create_model_cnn('mfcc')
+    elif use_small_cnn:
+        model = create_model_small_cnn('mfcc')
+    elif use_lstm:
+        model = create_model_lstm('mfcc')
+    elif use_lstm_cnn:
+        model = create_model_lstm('mfcc',cnn = True)
+
+    else:
+        model = create_model_mlp('mfcc')
+    
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath='models\{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
+    save_weights_only=False,
+    monitor='val_accuracy',
+    mode='max',
+    save_best_only=True)
+    model.fit(train_data['mfcc'] if not use_lstm_cnn else train_data['mfcc'].reshape((-1,98,13,1)),train_label['mfcc'],validation_data = (validation_data['mfcc'] if not use_lstm_cnn else validation_data['mfcc'].reshape((-1,98,13,1)) ,validation_label['mfcc']),epochs = nb_epochs,batch_size = batch,callbacks = model_checkpoint_callback)
+
+
+if use_ssc:
+    print('Training on {} examples !'.format(train_data['ssc'].shape[0]))
+    
+    print('Validation on {} examples !'.format(validation_data['ssc'].shape[0]))
+    if use_cnn:
+        model = create_model_cnn('ssc')
+    elif use_small_cnn:
+        model = create_model_small_cnn('ssc')
+    elif use_lstm:
+        model = create_model_lstm('ssc')
+    elif use_lstm_cnn:
+        model = create_model_lstm('ssc',cnn = True)
+
+    else:
+        model = create_model_mlp('ssc')
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath='models\{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
+    save_weights_only=False,
+    monitor='val_accuracy',
+    mode='max',
+    save_best_only=True)
+    model.fit(train_data['ssc'] if not use_lstm_cnn else train_data['ssc'].reshape((-1,98,26,1)),train_label['ssc'],validation_data = (validation_data['ssc'] if not use_lstm_cnn else validation_data['ssc'].reshape((-1,98,26,1)),validation_label['ssc']),epochs = nb_epochs,batch_size = batch,callbacks = model_checkpoint_callback)
+ 
+
+if use_raw:
+    print('Training on {} examples !'.format(train_data['raw'].shape))
+    
+    print('Validation on {} examples !'.format(validation_data['raw'].shape))
+    
+    
+    if use_cnn:
+        model = create_model_cnn('raw')
+    elif use_small_cnn:
+        model = create_model_small_cnn('raw')
+    elif use_lstm:
+        model = create_model_lstm('raw')
+    elif use_lstm_cnn:
+        model = create_model_lstm('raw',cnn = True)
+    else:
+        model = create_model_mlp('raw')
+    
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath='models\{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
+    save_weights_only=False,
+    monitor='val_accuracy',
+    mode='max',
+    save_best_only=True)
+    model.fit(train_data['raw'].reshape((-1,16000,1)),train_label['raw'],validation_data = (validation_data['raw'].reshape((-1,16000,1)),validation_label['raw']),epochs = nb_epochs,batch_size = batch,callbacks = model_checkpoint_callback)
+  
+
+
+
+# if use_raw:
+#     print('Training on {} examples !'.format(train_data['raw'].shape))
+    
+#     print('Validation on {} examples !'.format(validation_data['raw'].shape))
+#     model_double = create_model_small_cnn(input_shape= (16000,1))
+#     print(train_data['raw'].reshape((2300,-1,1)).shape)
+#     model_double.fit(train_data['raw'].reshape((2300,-1,1)),train_label['raw'],validation_data = (validation_data['raw'].reshape((440,-1,1)),validation_label['raw']),epochs = nb_epochs,batch_size = batch)
+#     model_double.save('models\{}_{}epochs_{}batchsize_raw.h5'.format(model_double.name,nb_epochs,batch))    
 
 
 
