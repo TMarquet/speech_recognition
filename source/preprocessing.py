@@ -23,6 +23,7 @@ unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "shei
 
 PATH_LIST = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/lists/'
 PATH_DATA = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/data/'
+PATH_MODELS= 'C:/Users/kahg8/Documents/GitHub/speech_recognition/models/'
 
 # training_size = 'all'
 

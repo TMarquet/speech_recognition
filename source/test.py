@@ -17,7 +17,9 @@ from tensorflow.keras.models import load_model
 
 from preprocessing import get_test_data
 
-
+PATH_LIST = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/lists/'
+PATH_DATA = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/data/'
+PATH_MODELS= 'C:/Users/kahg8/Documents/GitHub/speech_recognition/models/'
 
 ############################
 test_size = 'all'
@@ -228,7 +230,7 @@ def hist(data_mfcc,data_ssc,list_label,name):
 test_data ,test_labels  = get_test_data(labels, unknown_labels,test_size, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise)
 print(test_data['mfcc'].shape)
 print(test_data['ssc'].shape)
-directory_path = 'models'
+directory_path = PATH_MODELS
 for file in os.listdir(directory_path):
     if not '.h5' in file:
         continue

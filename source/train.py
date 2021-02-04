@@ -19,6 +19,8 @@ from tensorflow.keras import backend as K
 from preprocessing import get_training_data
 from tensorflow.keras.regularizers import l2
 
+PATH_LIST = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/lists/'
+PATH_DATA = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/data/'
 PATH_MODELS= 'C:/Users/kahg8/Documents/GitHub/speech_recognition/models/'
 
 tf.random.set_seed(7)
