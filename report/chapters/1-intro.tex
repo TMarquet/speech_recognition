@@ -1,0 +1,18 @@
+\section{Introduction}
+From our devices listening to you and waiting for you to call their names, to removing the language barrier between humans using automated translation, speech recognition is definitively one of the most growing technology. Being able to speak to a computer using the most natural communication vector of them all, will enhance many daily life applications. Many of us lives permanently with at least one computer more powerful than everything that we could think of 20 years ago, and this computer has access to almost infinite calculation power through the cloud with a low latency. Therefore the use of neural networks to enable robust human/computer communication through voice became possible on large scale and outclassed classical techniques.
+
+\section{Task description}
+
+This work is an introduction to speech recognition. We use a public dataset brought by Google called "Google speech commands v1". The task is the classification of 20 differents small words which could be commonly used to give commands to a computer. We'll compare the results of differents type and size of neural networks which are known to fit such tasks.
+
+\vspace{5mm}
+
+The words that we want to learn are the following : "yes" ,  "no" , "stop" , "go" , "down" , "up" , "left" , "right" , "on" , "off" , "zero" , "one" , "two" , "three" , "four", "five" , "six" , "seven" , "eight" , "nine".
+
+\vspace{5mm}
+
+We also want to recognize when there is an other word than those 20. To do so we'll use 10 additionnals words that will be labeled under "unknown". Those words are  :  "marvin", "sheila" , "tree" , "wow" , "bed" , "bird", "dog" , "cat" , "happy" , "house". 
+
+\vspace{5mm}
+
+Finally, we also want to recognize when there is no word spoken. We'll add a silence label.

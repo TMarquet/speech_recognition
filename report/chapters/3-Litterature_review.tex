@@ -1,0 +1,13 @@
+There are many types of neural networks and each of them perform differently according to the task. Considering the low vocabulary of our task and the large amount of data, we'll be looking to search for patterns through the identification of templates with neural networks. Therefore, CNN comes immediately to mind. But many works suggests the use of recurrent neural networks. Therefore we'll focus on those two types of networks that seems to be the most promising. Finally, MLPs are usually mentionned but not for their performances, mostly because they are easy to implement and it's always a nice comparison.
+
+\vspace{5mm}
+
+Keyword spotting task are extremely fit to CNNs according to many research CITE GOOGLE. A DNN cannot take advantage of the topology of the signal, however CNNs are extremely good at acoustic modeling which permits to give a good representation of a speech spectrum. The differences of frequencies between each speaker and also the timing differences between each examples are known to be easily handled by CNNs.
+
+\vspace{5mm}
+
+RNNs and especially LSTMs are also fit to this task because of their ability to take into account time sequences through feedback connections. They also benefits from the combination of lstm layers with deep or convolutionnal layers CITEALEX GRAVES. But one of the main problem encountered with RNNs, is that they are slow for many reasons (no parrellelization, slow learning, ...). Therefore the trend is to move away from recurrent structures.
+
+
+
+
