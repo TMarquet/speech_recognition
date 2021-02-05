@@ -1,2 +1,0 @@
-- name: Compile LateX
-  uses: vinay0410/tectonic-action@v1.1.2
