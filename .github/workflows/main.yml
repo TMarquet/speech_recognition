@@ -31,3 +31,10 @@ jobs:
         with: 
           tex_path: 'report/main.tex'
           push: 'yes'
+      - name: Compile LateX
+        uses: vinay0410/tectonic-action@v1.1.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with: 
+          tex_path: 'presentation/main.tex'
+          push: 'yes'
