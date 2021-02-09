@@ -48,7 +48,7 @@ But as we can see below, amongst the others examples you will find some that are
 
 \section{Preprocessing data : Mel Frequency Cepstral Coefficients}
 
-The mfcc features are by far the most common way to preprocess audio data. The idea is to represent the power spectrum in a small subset of features over time windows of the signal. The spectrum will be projected on a Mel-scale which is a way to represent the frequencies of a signal closer to how we hear sounds.
+The mfcc features are by far the most common way to preprocess audio data \cite{review}. The idea is to represent the power spectrum in a small subset of features over time windows of the signal. The spectrum will be projected on a Mel-scale which is a way to represent the frequencies of a signal closer to how we hear sounds.
 
 \subsection{How do we calculate those coefficients ?}
 
@@ -77,7 +77,7 @@ This will yields an array of $98 $ x $ n_{filters}$ , $ n_{filters}$ being an ar
 
 \section{Preprocessing data : Spectral Subband centroids}
 
-To calculate those features, you've to divide the signal into $n_sub$ subbands and take the centroid of each one. The centroid of a subband is the weighted mean of the frequencies in the signal weighted by their magnitude. The number of subbands is arbitrarly chosen (usually 26). You can see the full calculation here CITE SUBBAND.
+To calculate those features, you've to divide the signal into $n_sub$ subbands and take the centroid of each one. The centroid of a subband is the weighted mean of the frequencies in the signal weighted by their magnitude. The number of subbands is arbitrarly chosen (usually 26). You can see the full calculation here \cite{subband}.
 
 \newpage
 
@@ -88,4 +88,4 @@ To calculate those features, you've to divide the signal into $n_sub$ subbands a
     \label{fig:mfcc_yes}
 \end{figure}
 
-Those features are extremely different from the mfcc and have been proven to be complementary CITE SUBBANDCOMPL. 
+Those features are extremely different from the mfcc and have been proven to be complementary \cite{subband_comp}. 
