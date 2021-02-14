@@ -13,28 +13,23 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in paralle
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  compile_latex:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Compile
+        uses: birjolaxew/tectonic-biber-action@master
+        with:
+          files: |
+            presentation/main.tex
+            report/main.tex
+      - name: Upload PDF
+        uses: actions/upload-artifact@master
+        with:
+          name: pdf
+          path: |
+            presentation/main.pdf
+            report/main.pdf
 
-      # Runs a single command using the runners shell
-      - name: Compile LateX
-        uses: vinay0410/tectonic-action@v1.1.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with: 
-          tex_path: 'report/main.tex'
-          push: 'yes'
-      - name: Compile LateX
-        uses: vinay0410/tectonic-action@v1.1.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with: 
-          tex_path: 'presentation/main.tex'
-          push: 'yes'
+
