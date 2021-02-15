@@ -15,11 +15,11 @@ import random
 from python_speech_features import mfcc,ssc
 from tensorflow.keras.models import load_model
 
-labels = ["yes", "no", "up", "down", "left",
-"right", "on", "off", "stop", "go", "zero", "one", "two", "three", "four",
-"five", "six", "seven", "eight", "nine",'silence','unknown']
-unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "sheila",
-"tree","wow"]
+labels = ["yes", "no", "up", "down", "left","right", "on", "off", "stop", "go", "zero"
+          , "one", "two", "three", "four","five", "six", "seven", "eight", "nine",'silence','unknown']
+
+
+unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "sheila","tree","wow"]
 
 PATH_LIST = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/lists/'
 PATH_DATA = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/data/'

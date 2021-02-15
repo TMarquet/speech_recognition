@@ -1,0 +1,258 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nyt/global//global/global}
+    \entry{ATTRNN}{article}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=640a856be10e0c771d51a70a4996fa2f}{%
+           family={Andrade},
+           familyi={A\bibinitperiod},
+           given={Douglas\bibnamedelima Coimbra},
+           giveni={D\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0,
+           prefix={de},
+           prefixi={d\bibinitperiod},
+           prefixun=0}}%
+        {{un=0,uniquepart=base,hash=9b87be92171ba62431a02872772e18a9}{%
+           family={Leo},
+           familyi={L\bibinitperiod},
+           given={Sabato},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f7a42c1d7a462fecbade466b6fd25e3a}{%
+           family={Viana},
+           familyi={V\bibinitperiod},
+           given={Martin\bibnamedelimb Loesener\bibnamedelimb Da\bibnamedelima Silva},
+           giveni={M\bibinitperiod\bibinitdelim L\bibinitperiod\bibinitdelim D\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=84d3259dd9d00045e7bb43f6e7dc26c6}{%
+           family={Bernkopf},
+           familyi={B\bibinitperiod},
+           given={Christoph},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{7106e108aa267e80e6da56ee932860b8}
+      \strng{fullhash}{15f2907993f09e11a3c2af1e2f568712}
+      \strng{bibnamehash}{15f2907993f09e11a3c2af1e2f568712}
+      \strng{authorbibnamehash}{15f2907993f09e11a3c2af1e2f568712}
+      \strng{authornamehash}{7106e108aa267e80e6da56ee932860b8}
+      \strng{authorfullhash}{15f2907993f09e11a3c2af1e2f568712}
+      \field{sortinit}{A}
+      \field{sortinithash}{a3dcedd53b04d1adfd5ac303ecd5e6fa}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{A neural attention model for speech command recognition}
+      \field{year}{2018}
+    \endentry
+    \entry{graves}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=dfca94b0427da7f9088af596e23b46c0}{%
+           family={Graves},
+           familyi={G\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=0d87a656f9bdc99e921c45f73da515b8}{%
+           family={Mohamed},
+           familyi={M\bibinitperiod},
+           given={Abdel-rahman},
+           giveni={A\bibinithyphendelim r\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9a8750ccdb2a4cf14d2655face1ce016}{%
+           family={Hinton},
+           familyi={H\bibinitperiod},
+           given={Geoffrey},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{8b91c8aa3714ffeda8908af3996aa567}
+      \strng{fullhash}{4f389071d4a8c288b23b12fb452cbb6a}
+      \strng{bibnamehash}{4f389071d4a8c288b23b12fb452cbb6a}
+      \strng{authorbibnamehash}{4f389071d4a8c288b23b12fb452cbb6a}
+      \strng{authornamehash}{8b91c8aa3714ffeda8908af3996aa567}
+      \strng{authorfullhash}{4f389071d4a8c288b23b12fb452cbb6a}
+      \field{sortinit}{G}
+      \field{sortinithash}{62eb2aa29549e4fdbd3cb154ec5711cb}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Speech recognition with deep recurrent Neural Networks}
+      \field{year}{2013}
+    \endentry
+    \entry{review}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=3ce5f98b8acbdb29f26f04cda5c30dbb}{%
+           family={Kamble},
+           familyi={K\bibinitperiod},
+           given={Bhushan\bibnamedelima C.},
+           giveni={B\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{3ce5f98b8acbdb29f26f04cda5c30dbb}
+      \strng{fullhash}{3ce5f98b8acbdb29f26f04cda5c30dbb}
+      \strng{bibnamehash}{3ce5f98b8acbdb29f26f04cda5c30dbb}
+      \strng{authorbibnamehash}{3ce5f98b8acbdb29f26f04cda5c30dbb}
+      \strng{authornamehash}{3ce5f98b8acbdb29f26f04cda5c30dbb}
+      \strng{authorfullhash}{3ce5f98b8acbdb29f26f04cda5c30dbb}
+      \field{sortinit}{K}
+      \field{sortinithash}{d3edc18d54b9438a72c24c925bfb38f4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Speech recognition using Artificial Neural Networks - A Review}
+      \field{year}{2016}
+    \endentry
+    \entry{init}{article}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=6cc4afe0c331019afda1ad689a32121c}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Xuejiao},
+           giveni={X\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=94dffec766aad5da35c894505256e0e1}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Zixuan},
+           giveni={Z\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{36c6031980dc9e19cb44af10dd674b94}
+      \strng{fullhash}{77dea113bc796ed8877a97e852a61684}
+      \strng{bibnamehash}{77dea113bc796ed8877a97e852a61684}
+      \strng{authorbibnamehash}{77dea113bc796ed8877a97e852a61684}
+      \strng{authornamehash}{36c6031980dc9e19cb44af10dd674b94}
+      \strng{authorfullhash}{77dea113bc796ed8877a97e852a61684}
+      \field{sortinit}{L}
+      \field{sortinithash}{dad3efd0836470093a7b4a7bb756eb8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Speech Command Recognition with Convolutional Neural Networks}
+      \field{year}{2017}
+    \endentry
+    \entry{subband}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=b1d3b7d330a0b9cd14b9467a0dfa8189}{%
+           family={Paliwal},
+           familyi={P\bibinitperiod},
+           given={Kuldip\bibnamedelima K.},
+           giveni={K\bibinitperiod\bibinitdelim K\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{b1d3b7d330a0b9cd14b9467a0dfa8189}
+      \strng{fullhash}{b1d3b7d330a0b9cd14b9467a0dfa8189}
+      \strng{bibnamehash}{b1d3b7d330a0b9cd14b9467a0dfa8189}
+      \strng{authorbibnamehash}{b1d3b7d330a0b9cd14b9467a0dfa8189}
+      \strng{authornamehash}{b1d3b7d330a0b9cd14b9467a0dfa8189}
+      \strng{authorfullhash}{b1d3b7d330a0b9cd14b9467a0dfa8189}
+      \field{sortinit}{P}
+      \field{sortinithash}{bb5b15f2db90f7aef79bb9e83defefcb}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Spectral subband centroid features for speech recognition}
+      \field{year}{1998}
+    \endentry
+    \entry{CNN}{article}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=28a3d000e5cd60656250014708db8ec1}{%
+           family={Sainath},
+           familyi={S\bibinitperiod},
+           given={Tara\bibnamedelima N.},
+           giveni={T\bibinitperiod\bibinitdelim N\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7fe2d48ce31c87a150449138bad607f0}{%
+           family={Parada},
+           familyi={P\bibinitperiod},
+           given={Carolina},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{217b1453ee030fd4f6f9f33e942041bd}
+      \strng{fullhash}{703f896feb90812327ba5d68591e1889}
+      \strng{bibnamehash}{703f896feb90812327ba5d68591e1889}
+      \strng{authorbibnamehash}{703f896feb90812327ba5d68591e1889}
+      \strng{authornamehash}{217b1453ee030fd4f6f9f33e942041bd}
+      \strng{authorfullhash}{703f896feb90812327ba5d68591e1889}
+      \field{sortinit}{S}
+      \field{sortinithash}{c319cff79d99c853d775f88277d4e45f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Convolutional Neural Networks for Small-footprint Keyword Spotting}
+      \field{year}{2015}
+    \endentry
+    \entry{subband_comp}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=a1f97e83641ee8995780186881c3e35d}{%
+           family={Thian},
+           familyi={T\bibinitperiod},
+           given={Norman\bibnamedelimb Poh\bibnamedelima Hoon},
+           giveni={N\bibinitperiod\bibinitdelim P\bibinitperiod\bibinitdelim H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7694831f2c05781ca902be846d977d32}{%
+           family={Sanderson},
+           familyi={S\bibinitperiod},
+           given={Conrad},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=02404a92b0be3f52ec5ac08e41c13445}{%
+           family={Bengio},
+           familyi={B\bibinitperiod},
+           given={Samy},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{2e3b4184bfb52232383315806d32d29c}
+      \strng{fullhash}{f877e48f45856341a87dea4c2dafb5c7}
+      \strng{bibnamehash}{f877e48f45856341a87dea4c2dafb5c7}
+      \strng{authorbibnamehash}{f877e48f45856341a87dea4c2dafb5c7}
+      \strng{authornamehash}{2e3b4184bfb52232383315806d32d29c}
+      \strng{authorfullhash}{f877e48f45856341a87dea4c2dafb5c7}
+      \field{sortinit}{T}
+      \field{sortinithash}{51f9faf24c60c62ca764a77f78cf5666}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Spectral subband centroid as Complementary features for Speaker Authentication}
+      \field{year}{2004}
+    \endentry
+    \entry{dataset}{article}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=cfc28a19549f0d8ff117cf79be90d213}{%
+           family={Warden},
+           familyi={W\bibinitperiod},
+           given={Pete},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{cfc28a19549f0d8ff117cf79be90d213}
+      \strng{fullhash}{cfc28a19549f0d8ff117cf79be90d213}
+      \strng{bibnamehash}{cfc28a19549f0d8ff117cf79be90d213}
+      \strng{authorbibnamehash}{cfc28a19549f0d8ff117cf79be90d213}
+      \strng{authornamehash}{cfc28a19549f0d8ff117cf79be90d213}
+      \strng{authorfullhash}{cfc28a19549f0d8ff117cf79be90d213}
+      \field{sortinit}{W}
+      \field{sortinithash}{1af34bd8c148ffb32de1494636b49713}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Speech commands: A dataset for Limited-Vocabulary Speech Recognition}
+      \field{year}{2018}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

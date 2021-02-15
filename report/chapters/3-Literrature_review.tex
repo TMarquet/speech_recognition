@@ -10,4 +10,25 @@ RNNs and especially LSTMs are also fit to this task because of their ability to 
 
 
 
+\section{MLP}
 
+Neural networks are used to approximate functions which solving a non linear optimization problem that tries to find the minimum "distance" between the approximation and the real function. To do so, training algorithms try to find the set of weights that minimize the "distance" represented by the loss function.
+
+\vspace{5mm}
+
+MLPs are one of the most simple form yet usually reliable of neural networks. They are composed of one input layer, one output layer and at least one hidden layer. They are feed forward that means that the flow of information goes in only one direction : from input layer to output layer.
+
+
+\section{CNN}
+CNNs are an evolution of MLPs. Indeed, usually they have an MLP base that is situated at the end of the network but they also have some convolutions layers. the role of those convolution layers will be to split the input in order to find interesting information in a small subset of it. This will make CNN be able space dependecies in 2-d data. In addition of that, CNNs are usually more effective than MLPs in term of computation. 
+
+\section{LSTM}
+
+LSTM structures (Long short term memory) are a chain like network where you gives the output of a block as an input of the next one. The idea being similar to recurrent neural networks, it's about creating an artificial memory of how inputs evoluate over time. It is extremely interesting for tasks with temporal dependencies such as speech recognition. The improvement over the RNN structures is the forget gate that allows to manipulate weights of recurrents connections in order to face the vanishing gradient problem. Therefore 
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{chapters/pictures/lstm_unit.png}
+    \caption{Inside of a LSTM unit}
+    \label{fig:mlp}
+\end{figure}
