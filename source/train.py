@@ -27,7 +27,7 @@ np.random.seed(7)
 
 training_size = 'all'
 
-nb_epochs = 20
+nb_epochs = 200
 batch = 800
 nb_layers = 5
 num_ceps = 13
@@ -403,9 +403,14 @@ if use_mfcc:
     else:
         model = create_model_mlp('mfcc')
     
+    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath=PATH_MODELS + '{}_{}epochs_{}batchsize'.format(model.name,nb_epochs,batch),
+    save_weights_only=False,
+    monitor='val_accuracy',
+    mode='max',
+    save_best_only=True)
+    model.fit(train_data['mfcc'] if not use_lstm_cnn else train_data['mfcc'].reshape((-1,98,13,1)),train_label['mfcc'],validation_data = (validation_data['mfcc'] if not use_lstm_cnn else validation_data['mfcc'].reshape((-1,98,13,1)) ,validation_label['mfcc']),epochs = nb_epochs,batch_size = batch,callbacks = model_checkpoint_callback)
 
-    model.fit(train_data['mfcc'] if not use_lstm_cnn else train_data['mfcc'].reshape((-1,98,13,1)),train_label['mfcc'],validation_data = (validation_data['mfcc'] if not use_lstm_cnn else validation_data['mfcc'].reshape((-1,98,13,1)) ,validation_label['mfcc']),epochs = nb_epochs,batch_size = batch)
-    model.save(PATH_MODELS+'model')
 
 if use_ssc:
     print('Training on {} examples !'.format(train_data['ssc'].shape[0]))
