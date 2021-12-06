@@ -10,7 +10,7 @@ import os
 from tensorflow.keras.models import load_model
 # Convert the model
 from preprocessing import PATH_MODELS
-model = load_model(PATH_MODELS + 'model')
+model = load_model(PATH_MODELS + 'cnn_200epochs_800batchsize')
 model.summary()
 converter = tf.lite.TFLiteConverter.from_keras_model(model) # path to the SavedModel directory
 converter.optimizations = [tf.lite.Optimize.DEFAULT]
