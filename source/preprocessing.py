@@ -21,9 +21,9 @@ labels = ["yes", "no", "up", "down", "left","right", "on", "off", "stop", "go", 
 
 unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "sheila","tree","wow"]
 
-PATH_LIST = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/lists/'
-PATH_DATA = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/data/'
-PATH_MODELS= 'C:/Users/kahg8/Documents/GitHub/speech_recognition/models/'
+PATH_LIST = 'C:/Users/martho/Documents/speech_recognition/lists/'
+PATH_DATA = 'C:/Users/martho/Documents/speech_recognition/data/'
+PATH_MODELS= 'C:/Users/martho/Documents/speech_recognition/models/'
 
 # training_size = 'all'
 

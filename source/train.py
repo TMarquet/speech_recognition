@@ -12,25 +12,23 @@ import matplotlib.pyplot as plt
 
 
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
-from tensorflow.keras.optimizers import RMSprop,Adagrad
+from tensorflow.keras.optimizers import RMSprop,Adagrad,Adam
 from tensorflow.keras.models import Model, Sequential,load_model
 from tensorflow.keras.layers import TimeDistributed,Concatenate,Flatten, Dense, Input,Reshape,Permute, Lambda,Conv2D, Conv1D, MaxPooling1D,MaxPooling2D, GlobalMaxPooling1D, GlobalMaxPooling1D, AveragePooling1D, LSTM, Dropout, BatchNormalization
 from tensorflow.keras import backend as K
-from preprocessing import get_training_data
+from preprocessing import *
 from tensorflow.keras.regularizers import l2
+import pickle
 
-PATH_LIST = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/lists/'
-PATH_DATA = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/data/'
-PATH_MODELS= 'C:/Users/kahg8/Documents/GitHub/speech_recognition/models/'
 
 tf.random.set_seed(7)
 np.random.seed(7)
 ##############################################
 
-training_size = 'aqdzqzdll'
+training_size = 'all'
 
-nb_epochs = 80
-batch = 50
+nb_epochs = 20
+batch = 800
 nb_layers = 5
 num_ceps = 13
 data_type = 'mfcc'
@@ -316,40 +314,19 @@ def create_model_small_cnn(data_type,labels = len(labels) , learning_rate = 0.00
     if data_type == 'ssc' :
         input_shape = (98,26)
         
-    model = tf.keras.Sequential(name='small_cnn_'+data_type) 
-    
-    model.add(Input(input_shape))
+    in1 = Input(shape=input_shape)
+    conv = Conv1D(kernel_size=34, strides=17, filters=4, activation='relu', padding='same')(in1)
+    bn = BatchNormalization()(conv)
+
+    flatten = Flatten()(bn)
 
 
-    model.add(Conv1D(22, 3, padding='same', name='conv1'))
-    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization(name = 'batch_norm1'))
-    model.add(tf.keras.layers.Activation('relu'))
-    
-    model.add(Conv1D(44, 3, padding='same', name='conv2'))
-    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization(name = 'batch_norm2'))
-    model.add(tf.keras.layers.Activation('relu'))
-    
-    model.add(Conv1D(22, 3, padding='same', name='conv3'))
-    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization(name = 'batch_norm3'))
-    model.add(tf.keras.layers.Activation('relu'))
-    model.add(AveragePooling1D(2, strides=2, name='pooling'))
-    
+    x = Dense(50, activation='relu', kernel_initializer='random_uniform')(flatten)
 
-    model.add(Flatten(name = 'flatten'))
-    
-
-    model.add(Dense(dense_units, name='dense'))
-    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
-    model.add(BatchNormalization(name='batch_norm_dense'))
-    model.add(tf.keras.layers.Activation('relu'))    
-
-    model.add(Dense(labels, activation='softmax',name = 'output'))
-    optimizer = RMSprop(lr=learning_rate)
+    output = Dense(labels, activation='softmax')(x)
+    model = Model(inputs = [in1],outputs = [output],name='cnn')
+    optimizer = Adam(learning_rate=0.0005)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
-    model.summary()
     return model
 
 
@@ -365,11 +342,45 @@ def create_model_small_cnn(data_type,labels = len(labels) , learning_rate = 0.00
             # MAIN
 ##############################################
 
+try:
+    
+    file = open(PATH_DATA+'{}_training_data_cut{}_raw{}_mfcc{}_ssc{}_silence{}_da{}_noise{}.npy'.format(training_size,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise),'rb')
+    train_data = pickle.load(file)
+    file.close()
 
-train_data,train_label,validation_data,validation_label= get_training_data(training_size, labels, unknown_labels,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise)
+    file = open(PATH_DATA+'{}_training_labels_cut{}_raw{}_mfcc{}_ssc{}_silence{}_da{}_noise{}.npy'.format(training_size,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise),'rb')
+    train_label = pickle.load(file)
+    file.close()
+    
+    file = open(PATH_DATA+'{}_validation_data_cut{}_raw{}_mfcc{}_ssc{}_silence{}_da{}_noise{}.npy'.format(training_size,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise),'rb')
+    validation_data = pickle.load(file)
+    file.close()    
+    
+    file = open(PATH_DATA+'{}_validation_labels_cut{}_raw{}_mfcc{}_ssc{}_silence{}_da{}_noise{}.npy'.format(training_size,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise),'rb')
+    validation_label = pickle.load(file)
+    file.close()
+    
+    print('Loaded using pickle')
+    
+except:
+    train_data,train_label,validation_data,validation_label= get_training_data(training_size, labels, unknown_labels,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise)
+    
+    file = open(PATH_DATA+'{}_training_data_cut{}_raw{}_mfcc{}_ssc{}_silence{}_da{}_noise{}.npy'.format(training_size,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise),'wb')
+    pickle.dump(train_data,file)
+    file.close()
 
-
-
+    file = open(PATH_DATA+'{}_training_labels_cut{}_raw{}_mfcc{}_ssc{}_silence{}_da{}_noise{}.npy'.format(training_size,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise),'wb')
+    pickle.dump(train_label,file)
+    file.close()
+    
+    file = open(PATH_DATA+'{}_validation_data_cut{}_raw{}_mfcc{}_ssc{}_silence{}_da{}_noise{}.npy'.format(training_size,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise),'wb')
+    pickle.dump(validation_data,file)
+    file.close()    
+    
+    file = open(PATH_DATA+'{}_validation_labels_cut{}_raw{}_mfcc{}_ssc{}_silence{}_da{}_noise{}.npy'.format(training_size,use_cut, use_raw, use_mfcc, use_ssc, add_silence, data_augmentation,add_noise),'wb')
+    pickle.dump(validation_label,file)
+    file.close()
+    
 
 ###############################################
         # Single train
@@ -392,14 +403,9 @@ if use_mfcc:
     else:
         model = create_model_mlp('mfcc')
     
-    model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-    filepath=PATH_MODELS + '{}_{}epochs_{}batchsize.h5'.format(model.name,nb_epochs,batch),
-    save_weights_only=False,
-    monitor='val_accuracy',
-    mode='max',
-    save_best_only=True)
-    model.fit(train_data['mfcc'] if not use_lstm_cnn else train_data['mfcc'].reshape((-1,98,13,1)),train_label['mfcc'],validation_data = (validation_data['mfcc'] if not use_lstm_cnn else validation_data['mfcc'].reshape((-1,98,13,1)) ,validation_label['mfcc']),epochs = nb_epochs,batch_size = batch,callbacks = model_checkpoint_callback)
 
+    model.fit(train_data['mfcc'] if not use_lstm_cnn else train_data['mfcc'].reshape((-1,98,13,1)),train_label['mfcc'],validation_data = (validation_data['mfcc'] if not use_lstm_cnn else validation_data['mfcc'].reshape((-1,98,13,1)) ,validation_label['mfcc']),epochs = nb_epochs,batch_size = batch)
+    model.save(PATH_MODELS+'model.h5')
 
 if use_ssc:
     print('Training on {} examples !'.format(train_data['ssc'].shape[0]))

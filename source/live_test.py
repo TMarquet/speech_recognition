@@ -11,7 +11,7 @@ import numpy as np
 
 from tensorflow.keras.models import load_model
 
-from preprocessing import preprocess_live_data
+from preprocessing import *
 
 #(gpus = tf.config.experimental.list_physical_devices('GPU')
 
@@ -19,12 +19,7 @@ from preprocessing import preprocess_live_data
 
 #     tf.config.experimental.set_memory_growth(gpu, True)
 
-if __name__ == "__main__":
-
-    PATH_LIST = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/lists/'
-    PATH_DATA = 'C:/Users/kahg8/Documents/GitHub/speech_recognition/data/'
-    PATH_MODELS= 'C:/Users/kahg8/Documents/GitHub/speech_recognition/models/'
-    
+if __name__ == "__main__":   
     preprocessing = True
     data_augmentation = False
     fs=16000
