@@ -32,7 +32,13 @@ labels = ["yes", "no", "up", "down", "left",
 
 unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "sheila",
 "tree","wow"]
-model1 = load_model('models/bests_silence0/small_cnn_mfcc_60epochs_50batchsize.h5')
+model1 = load_model('models/bests_silence0/cnn_mfcc_30epochs_50batchsize.h5')
+
+
+
+
+
+
 
 def int_or_str(text):
     """Helper function for argument parsing."""
@@ -83,7 +89,7 @@ q_pred = queue.Queue(maxsize=31)
 q_speak = queue.Queue()
 
 vad = webrtcvad.Vad(int(3))
-
+speaking = False
 predicted_label = [[],[20]]
 
 def get_best_chunk(data):
@@ -148,15 +154,15 @@ def audio_callback(indata, frames, time, status):
 
         data = np.array(data)
 
-        
-        inputs = preprocess_live_data(data,16000)
+        if len(data) >=16000:
+            inputs = preprocess_live_data(data[:16000],16000)
+                
             
-        
-        prediction = model1.predict(np.array([inputs]))
-    #    prediction2 = model2.predict(inputs)
-        
-        predicted_label = np.where(prediction == np.amax(prediction))        
-        print("Predicted : ",labels[predicted_label[1][0]])
+            prediction = model1.predict(np.array([inputs]))
+        #    prediction2 = model2.predict(inputs)
+            
+            predicted_label = np.where(prediction == np.amax(prediction))        
+            print("Predicted : ",labels[predicted_label[1][0]])
   
         q_pred.queue.clear()        
 
@@ -164,10 +170,10 @@ def audio_callback(indata, frames, time, status):
         q_pred.get_nowait()
     q_pred.put(indata.copy())
  
-    #print(indata.shape)
+
     
-
-
+       
+ 
 def update_plot(frame):
     global plotdata
     global ax

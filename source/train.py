@@ -322,14 +322,17 @@ def create_model_small_cnn(data_type,labels = len(labels) , learning_rate = 0.00
 
 
     model.add(Conv1D(22, 3, padding='same', name='conv1'))
+    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name = 'batch_norm1'))
     model.add(tf.keras.layers.Activation('relu'))
     
     model.add(Conv1D(44, 3, padding='same', name='conv2'))
+    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name = 'batch_norm2'))
     model.add(tf.keras.layers.Activation('relu'))
     
     model.add(Conv1D(22, 3, padding='same', name='conv3'))
+    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name = 'batch_norm3'))
     model.add(tf.keras.layers.Activation('relu'))
     model.add(AveragePooling1D(2, strides=2, name='pooling'))
@@ -339,6 +342,7 @@ def create_model_small_cnn(data_type,labels = len(labels) , learning_rate = 0.00
     
 
     model.add(Dense(dense_units, name='dense'))
+    model.add(Lambda(lambda x: K.l2_normalize(x,axis=1)))
     model.add(BatchNormalization(name='batch_norm_dense'))
     model.add(tf.keras.layers.Activation('relu'))    
 
