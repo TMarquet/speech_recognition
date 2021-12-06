@@ -405,7 +405,7 @@ if use_mfcc:
     
 
     model.fit(train_data['mfcc'] if not use_lstm_cnn else train_data['mfcc'].reshape((-1,98,13,1)),train_label['mfcc'],validation_data = (validation_data['mfcc'] if not use_lstm_cnn else validation_data['mfcc'].reshape((-1,98,13,1)) ,validation_label['mfcc']),epochs = nb_epochs,batch_size = batch)
-    model.save(PATH_MODELS+'model.h5')
+    model.save(PATH_MODELS+'model')
 
 if use_ssc:
     print('Training on {} examples !'.format(train_data['ssc'].shape[0]))
