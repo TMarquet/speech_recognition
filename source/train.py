@@ -8,7 +8,7 @@ import tensorflow as tf
 
 # Helper libraries
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
@@ -459,14 +459,6 @@ if use_raw:
 
 
 
-# if use_raw:
-#     print('Training on {} examples !'.format(train_data['raw'].shape))
-    
-#     print('Validation on {} examples !'.format(validation_data['raw'].shape))
-#     model_double = create_model_small_cnn(input_shape= (16000,1))
-#     print(train_data['raw'].reshape((2300,-1,1)).shape)
-#     model_double.fit(train_data['raw'].reshape((2300,-1,1)),train_label['raw'],validation_data = (validation_data['raw'].reshape((440,-1,1)),validation_label['raw']),epochs = nb_epochs,batch_size = batch)
-#     model_double.save('models\{}_{}epochs_{}batchsize_raw.h5'.format(model_double.name,nb_epochs,batch))    
 
 
 
