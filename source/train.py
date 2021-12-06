@@ -315,8 +315,9 @@ def create_model_small_cnn(data_type,labels = len(labels) , learning_rate = 0.00
         input_shape = (98,26)
         
     in1 = Input(shape=input_shape)
-    conv = Conv1D(kernel_size=34, strides=17, filters=4, activation='selu', padding='same')(in1)
+    conv = Conv1D(kernel_size=34, strides=1, filters=4, activation='selu', padding='same')(in1)
     bn = BatchNormalization()(conv)
+
     pool = AveragePooling1D(pool_size=2, strides=2, padding='same')(bn)
     flatten = Flatten()(pool)
 
@@ -324,6 +325,7 @@ def create_model_small_cnn(data_type,labels = len(labels) , learning_rate = 0.00
     x = Dense(50, activation='selu', kernel_initializer='random_uniform')(flatten)
     x = Dense(100, activation='selu', kernel_initializer='random_uniform')(x)
     x = Dense(50, activation='selu', kernel_initializer='random_uniform')(x)
+    output = Dense(labels, activation='softmax')(x)
     model = Model(inputs = [in1],outputs = [output],name='cnn')
     optimizer = Adam(learning_rate=0.0005)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
