@@ -32,7 +32,7 @@ batch = 800
 nb_layers = 5
 num_ceps = 13
 data_type = 'mfcc'
-network_type = 'small_cnn'
+network_type = 'cnn'
 
 data_augmentation = False
 
