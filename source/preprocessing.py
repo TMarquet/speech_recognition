@@ -10,7 +10,7 @@ import os
 import numpy as np
 import time
 from scipy.io import wavfile
-
+import sys
 import random
 from python_speech_features import mfcc,ssc
 from tensorflow.keras.models import load_model
@@ -21,9 +21,9 @@ labels = ["yes", "no", "up", "down", "left","right", "on", "off", "stop", "go", 
 
 unknown_labels = ["bed", "bird", "cat", "dog", "happy", "house", "marvin", "sheila","tree","wow"]
 
-PATH_LIST = 'C:/Users/martho/Documents/speech_recognition/lists/'
-PATH_DATA = 'C:/Users/martho/Documents/speech_recognition/data/'
-PATH_MODELS= 'C:/Users/martho/Documents/speech_recognition/models/'
+PATH_LIST = 'C:/Users/martho/Documents/speech_recognition/'  if sys.platform == 'win32' else '/root/Projets/speech_recognition/'  + 'lists/'
+PATH_DATA = 'C:/Users/martho/Documents/speech_recognition/' if sys.platform == 'win32' else '/root/Projets/speech_recognition/'  + 'data/'
+PATH_MODELS= 'C:/Users/martho/Documents/speech_recognition/' if sys.platform == 'win32' else '/root/Projets/speech_recognition/'  + 'models/'
 
 # training_size = 'all'
 
